@@ -11,7 +11,7 @@ plugins {
 
     // Apply the java-library plugin for API and implementation separation.
     `java-library`
-    id("maven-publish")
+    `maven-publish`
 }
 
 repositories {
@@ -41,6 +41,7 @@ java {
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(17))
     }
+    withSourcesJar()
 }
 
 tasks.named<Test>("test") {
@@ -49,6 +50,12 @@ tasks.named<Test>("test") {
 }
 
 publishing {
+    publications {
+        create<MavenPublication>("aoc-lib") {
+            from(components["java"])
+        }
+    }
+
     repositories {
         maven {
             name = "GitHubPackages"
