@@ -18,3 +18,4 @@ jobs:
           arguments: assemble publish
         env:
           BUILD_VERSION: ${{ github.event.release.tag_name }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
