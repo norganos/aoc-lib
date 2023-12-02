@@ -1,7 +1,8 @@
 name: Release Build
 on:
-  release:
-    types: [published]
+  push:
+    branches:
+      - '**'
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -12,9 +13,7 @@ jobs:
         with:
           java-version: 17
           distribution: temurin
-      - name: build, test & publish
+      - name: build & test
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: assemble publish
-        env:
-          BUILD_VERSION: $GITHUB_RELEASE_TAG
+          arguments: test
