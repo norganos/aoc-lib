@@ -14,6 +14,9 @@ plugins {
     `maven-publish`
 }
 
+group = "de.linkel.aoc"
+version = System.getenv("BUILD_VERSION") ?: "local"
+
 repositories {
     // Use Maven Central for resolving dependencies.
     mavenCentral()
@@ -48,10 +51,14 @@ tasks.named<Test>("test") {
     // Use JUnit Platform for unit tests.
     useJUnitPlatform()
 }
+tasks.named<Jar>("jar") {
+    archiveBaseName.value("aoc-utils")
+}
 
 publishing {
     publications {
         create<MavenPublication>("aoc-lib") {
+            artifactId = "aoc-utils"
             from(components["java"])
         }
     }
@@ -61,8 +68,8 @@ publishing {
             name = "GitHubPackages"
             url = uri("https://maven.pkg.github.com/norganos/aoc-lib")
             credentials {
-                username = System.getenv("GITHUB_ACTOR")
-                password = System.getenv("GITHUB_TOKEN")
+                username = System.getenv("GITHUB_ACTOR") ?: "asd"
+                password = System.getenv("GITHUB_TOKEN") ?: "Asd"
             }
         }
     }
