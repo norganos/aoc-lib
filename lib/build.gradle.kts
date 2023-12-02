@@ -68,8 +68,8 @@ publishing {
             name = "GitHubPackages"
             url = uri("https://maven.pkg.github.com/norganos/aoc-utils")
             credentials {
-                username = System.getenv("GITHUB_ACTOR") ?: "asd"
-                password = System.getenv("GITHUB_TOKEN") ?: "Asd"
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
             }
         }
     }
