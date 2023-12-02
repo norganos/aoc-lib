@@ -57,7 +57,7 @@ tasks.named<Jar>("jar") {
 
 publishing {
     publications {
-        create<MavenPublication>("aoc-lib") {
+        create<MavenPublication>("aoc-utils") {
             artifactId = "aoc-utils"
             from(components["java"])
         }
@@ -66,7 +66,7 @@ publishing {
     repositories {
         maven {
             name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/norganos/aoc-lib")
+            url = uri("https://maven.pkg.github.com/norganos/aoc-utils")
             credentials {
                 username = System.getenv("GITHUB_ACTOR") ?: "asd"
                 password = System.getenv("GITHUB_TOKEN") ?: "Asd"
