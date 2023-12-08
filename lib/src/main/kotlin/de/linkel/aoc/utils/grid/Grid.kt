@@ -1,7 +1,5 @@
 package de.linkel.aoc.utils.grid
 
-import java.lang.IllegalArgumentException
-
 class Grid<T: Any>(
     origin: Point = Point(0,0),
     dimension: Dimension = Dimension(0,0)
@@ -250,5 +248,4 @@ class Grid<T: Any>(
         val distance: Int,
         val before: Point?
     )
-
 }

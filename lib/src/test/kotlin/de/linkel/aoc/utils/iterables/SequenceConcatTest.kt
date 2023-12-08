@@ -1,5 +1,8 @@
-package de.linkel.aoc.utils
+package de.linkel.aoc.utils.iterables
 
+import de.linkel.aoc.utils.mixins.append
+import de.linkel.aoc.utils.mixins.plus
+import de.linkel.aoc.utils.mixins.prepend
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 
