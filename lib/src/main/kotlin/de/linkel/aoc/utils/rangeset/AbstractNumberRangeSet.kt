@@ -1,6 +1,6 @@
 package de.linkel.aoc.utils.rangeset
 
-import de.linkel.aoc.utils.mixins.ConcatIterator
+import de.linkel.aoc.utils.iterables.ConcatIterator
 
 abstract class AbstractNumberRangeSet<O, T, R, C>(
     ranges: Iterable<R>,
@@ -25,7 +25,6 @@ abstract class AbstractNumberRangeSet<O, T, R, C>(
                 cache.add(range)
             }
         }
-        println("$ranges -> $cache")
         segments = cache.toList()
         first = segments.firstOrNull()?.start ?: factory.maxValue
         last = segments.lastOrNull()?.endInclusive ?: factory.minValue

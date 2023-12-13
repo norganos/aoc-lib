@@ -6,7 +6,7 @@ data class Node<K>(
 )
 
 class Graph<K>(
-    nodes: Set<Node<K>>
+    val nodes: Set<Node<K>>
 ) {
     private val network = nodes.associateBy { it.id }
 
@@ -77,6 +77,28 @@ class Graph<K>(
                         bfsStep(it.key, isDest, path + listOf(it.key))
                     }
             }
+    }
+
+    fun subGraphs(): Iterable<Graph<K>> {
+        val results = mutableListOf<Set<Node<K>>>()
+        val all = network.keys.toMutableSet()
+        while (all.isNotEmpty()) {
+            val first = all.first()
+            val current = mutableSetOf<K>()
+            val queue = mutableListOf(first)
+            while (queue.isNotEmpty()) {
+                val node = queue.removeAt(0)
+                current.add(node)
+                queue.addAll(
+                    network[node]!!.edges.keys
+                       .filter { it !in current }
+                )
+            }
+            results.add(current.map { network[it]!! }.toSet())
+            all.removeAll(current)
+        }
+        return results
+            .map { Graph(it) }
     }
 
     data class DijkstraNode<K>(

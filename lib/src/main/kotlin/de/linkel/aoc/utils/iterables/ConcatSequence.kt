@@ -1,4 +1,4 @@
-package de.linkel.aoc.utils.mixins
+package de.linkel.aoc.utils.iterables
 
 fun <T> Sequence<T>.prepend(element: T): Sequence<T> {
     return if (this is ConcatSequence<T>) {

@@ -1,7 +1,7 @@
 package de.linkel.aoc.utils.rangeset
 
-import de.linkel.aoc.utils.mixins.intersect
-import de.linkel.aoc.utils.mixins.intersects
+import de.linkel.aoc.utils.iterables.intersect
+import de.linkel.aoc.utils.iterables.intersects
 
 class LongRangeSetFactory: RangeFactory<Long, LongRange, Long> {
     companion object {

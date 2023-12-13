@@ -1,4 +1,4 @@
-package de.linkel.aoc.utils.mixins
+package de.linkel.aoc.utils.iterables
 
 import de.linkel.aoc.utils.CommonMath
 import java.math.BigDecimal

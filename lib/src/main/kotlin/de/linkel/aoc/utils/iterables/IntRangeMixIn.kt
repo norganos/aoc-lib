@@ -1,4 +1,4 @@
-package de.linkel.aoc.utils.mixins
+package de.linkel.aoc.utils.iterables
 
 fun IntRange.intersects(other: IntRange): Boolean {
     return (this.first <= other.first && this.last >= other.first) || (other.first <= this.first && other.last >= this.first)

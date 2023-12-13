@@ -1,7 +1,5 @@
 package de.linkel.aoc.utils.iterables
 
-import de.linkel.aoc.utils.mixins.intersect
-import de.linkel.aoc.utils.mixins.intersects
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 
