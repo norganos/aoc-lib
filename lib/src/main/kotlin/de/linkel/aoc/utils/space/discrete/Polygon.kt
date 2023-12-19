@@ -1,9 +1,7 @@
 package de.linkel.aoc.utils.space.discrete
 
-import java.lang.IllegalArgumentException
-
 @Suppress("unused")
-class Polygon(points: Collection<Point3d>) {
+class Polygon(points: List<Point3d>) {
     val corners = points.sorted().distinct().toList()
     val normalVector: Vector3d
 

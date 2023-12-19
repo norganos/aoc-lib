@@ -1,9 +1,5 @@
 package de.linkel.aoc.utils.grid
 
-import java.lang.IllegalArgumentException
-import kotlin.math.abs
-import kotlin.math.sign
-
 data class Point(
     val x: Int,
     val y: Int
@@ -20,25 +16,15 @@ data class Point(
             deltaY = y - p.y
         )
     }
+    operator fun minus(v: Vector): Point {
+        return copy(
+            x = x - v.deltaX,
+            y = y - v.deltaY
+        )
+    }
 
-    operator fun rangeTo(p: Point): List<Point> {
-        if (p == this) {
-            return listOf(p)
-        }
-        val vector = p - this
-        return if (vector.deltaY == 0) {
-            (0 .. abs(vector.deltaX))
-                .map { i -> this.copy(
-                    x = x + (i) * vector.deltaX.sign
-                )}
-        } else if (vector.deltaX == 0) {
-            (0 .. abs(vector.deltaY))
-                .map { i -> this.copy(
-                    y = y + (i) * vector.deltaY.sign
-                )}
-        } else {
-            throw IllegalArgumentException("rangeTo only works in straight lines")
-        }
+    operator fun rangeTo(p: Point): Segment {
+        return Segment(this, p)
     }
 
     override fun toString(): String {

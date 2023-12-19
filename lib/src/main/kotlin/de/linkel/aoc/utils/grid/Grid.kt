@@ -2,7 +2,7 @@ package de.linkel.aoc.utils.grid
 
 class Grid<T: Any>(
     origin: Point = Point(0,0),
-    dimension: Dimension = Dimension(0,0)
+    dimension: Dimension = Dimension(1,1)
 ) {
     companion object {
         fun <T: Any> parse(lines: Sequence<String>, lambda: (pos: Point, c: Char) -> T?): Grid<T> {
@@ -27,7 +27,7 @@ class Grid<T: Any>(
         }
     }
 
-    var area = Area(
+    var boundingBox = Rectangle(
         x = origin.x,
         y = origin.y,
         width = dimension.width,
@@ -36,27 +36,27 @@ class Grid<T: Any>(
 
     // evtl nen performance-optimierteren zugriff? / ne liste aller belegten punkte pro row/col?
     private val store = mutableMapOf<Point, T>()
-    val width get(): Int = area.width
-    val height get(): Int = area.height
-    val maxSize get(): Int = area.width * area.height
+    val width get(): Int = boundingBox.width
+    val height get(): Int = boundingBox.height
+    val area get(): Int = boundingBox.width * boundingBox.height
 
     val size get(): Int = store.size
 
     fun crop() {
-        area = getDataBoundingBox()
+        boundingBox = getDataBoundingBox()
     }
     fun stretchTo(point: Point) {
-        area = area.extendTo(point)
+        boundingBox = boundingBox.extendTo(point)
     }
 
     private fun checkPoint(point: Point) {
-        if (point !in area) {
-            throw IllegalArgumentException("coordinates $point out of bounds ($area)")
+        if (point !in boundingBox) {
+            throw IllegalArgumentException("coordinates $point out of bounds ($boundingBox)")
         }
     }
 
     operator fun contains(point: Point): Boolean {
-        return point in area
+        return point in store
     }
 
     operator fun get(pos: Point): T? {
@@ -73,25 +73,25 @@ class Grid<T: Any>(
         }
     }
 
-    fun getDataBoundingBox(): Area {
+    fun getDataBoundingBox(): Rectangle {
         val minX = store.keys.minOf { it.x }
         val minY = store.keys.minOf { it.y }
         val maxX = store.keys.maxOf { it.x }
         val maxY = store.keys.maxOf { it.y }
-        return Area(minX, minY, maxX - minX + 1, maxY - minY + 1)
+        return Rectangle(minX, minY, maxX - minX + 1, maxY - minY + 1)
     }
 
     @Suppress("unused")
     fun getRow(y: Int): List<DataPoint<T?>> {
-        return List(area.width) { dx ->
-            val p = Point(area.x + dx, y)
+        return List(boundingBox.width) { dx ->
+            val p = Point(boundingBox.x + dx, y)
             DataPoint(p, store[p])
         }
     }
 
     fun getRowData(y: Int): List<DataPoint<T>> {
-        return List(area.width) { dx ->
-                Point(area.x + dx, y)
+        return List(boundingBox.width) { dx ->
+                Point(boundingBox.x + dx, y)
             }
             .filter { store[it] != null }
             .map { DataPoint(it, store[it]!!) }
@@ -100,15 +100,15 @@ class Grid<T: Any>(
 
     @Suppress("unused")
     fun getCol(x: Int): List<DataPoint<T?>> {
-        return List(area.height) { dy ->
-            val p = Point(x, area.y + dy)
+        return List(boundingBox.height) { dy ->
+            val p = Point(x, boundingBox.y + dy)
             DataPoint(p, store[p])
         }
     }
 
     fun getColData(x: Int): List<DataPoint<T>> {
-        return List(area.height) { dy ->
-                Point(x, area.y + dy)
+        return List(boundingBox.height) { dy ->
+                Point(x, boundingBox.y + dy)
             }
             .filter { store[it] != null }
             .map { DataPoint(it, store[it]!!) }
@@ -135,7 +135,7 @@ class Grid<T: Any>(
     }
 
     fun <R: Any> transform(lambda: (pos: Point, data: T) -> R?): Grid<R> {
-        return Grid<R>(area.origin, area.dimension)
+        return Grid<R>(boundingBox.origin, boundingBox.dimension)
             .let { other ->
                 store.entries.forEach { entry ->
                     val r = lambda(entry.key, entry.value)
@@ -148,7 +148,7 @@ class Grid<T: Any>(
     }
 
     fun <R: Any> transformComplete(lambda: (points: Map<Point, T>) -> Map<Point, R>): Grid<R> {
-        return Grid<R>(area.origin, area.dimension)
+        return Grid<R>(boundingBox.origin, boundingBox.dimension)
             .let { other ->
                 other.store.putAll(lambda(store))
                 other
@@ -157,7 +157,7 @@ class Grid<T: Any>(
 
     @Suppress("unused")
     fun copy(): Grid<T> {
-        return Grid<T>(area.origin, area.dimension)
+        return Grid<T>(boundingBox.origin, boundingBox.dimension)
             .let { other ->
                 store.entries.forEach { entry ->
                     other.store[entry.key] = entry.value
@@ -209,7 +209,7 @@ class Grid<T: Any>(
     }
 
     fun dijkstra(start: Point, isDest: (point: DataPoint<T>) -> Boolean, getNeighbours: (from: DataPoint<T>) -> Collection<Point>): List<DataPoint<T>>? {
-        val max = this.maxSize + 1
+        val max = this.area + 1
         val weightMap = transform { p, d -> DijkstraNode(d, if (p == start) 0 else max, null) }
         val points = weightMap.getAllData().map { it.point }.toMutableSet()
         var dest: Point? = null
@@ -248,4 +248,9 @@ class Grid<T: Any>(
         val distance: Int,
         val before: Point?
     )
+}
+
+
+infix fun <T : Any> Point.inside(grid: Grid<T>): Boolean {
+    return this in grid.boundingBox
 }
