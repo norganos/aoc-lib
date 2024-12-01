@@ -3,7 +3,7 @@ package de.linkel.aoc.utils.grid
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 
-class SegmentTest {
+class SegmentDTest {
     @Test
     fun `basic properties work with point-to-point constructor`() {
         val segment = Segment(Point(1, 1), Point(5, 1))

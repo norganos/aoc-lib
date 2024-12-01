@@ -3,7 +3,7 @@ package de.linkel.aoc.utils.grid
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 
-class PointTest {
+class PointDTest {
     @Test
     fun `basic properties work`() {
         val point = Point(1, 2)

@@ -3,7 +3,7 @@ package de.linkel.aoc.utils.grid
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 
-class DimensionTest {
+class DimensionDTest {
     @Test
     fun `negative dimension do not work`() {
         Assertions.assertThatThrownBy { Dimension(-1, 1) }.isInstanceOf(IllegalArgumentException::class.java)

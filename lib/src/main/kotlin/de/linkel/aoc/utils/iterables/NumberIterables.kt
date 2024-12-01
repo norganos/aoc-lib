@@ -1,6 +1,6 @@
 package de.linkel.aoc.utils.iterables
 
-import de.linkel.aoc.utils.CommonMath
+import de.linkel.aoc.utils.math.CommonMath
 import java.math.BigDecimal
 
 fun Iterable<BigDecimal>.sum() = this.reduce(BigDecimal::plus)
@@ -19,3 +19,4 @@ fun Iterable<Int>.lcm() = this.reduce(CommonMath::lcm)
 fun Sequence<Int>.lcm() = this.reduce(CommonMath::lcm)
 fun Iterable<Long>.lcm() = this.reduce(CommonMath::lcm)
 fun Sequence<Long>.lcm() = this.reduce(CommonMath::lcm)
+

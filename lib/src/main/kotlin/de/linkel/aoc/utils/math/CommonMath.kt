@@ -1,4 +1,4 @@
-package de.linkel.aoc.utils
+package de.linkel.aoc.utils.math
 
 import java.math.BigDecimal
 import java.math.BigInteger

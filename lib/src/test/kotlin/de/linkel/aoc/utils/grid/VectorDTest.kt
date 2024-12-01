@@ -3,7 +3,7 @@ package de.linkel.aoc.utils.grid
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 
-class VectorTest {
+class VectorDTest {
     @Test
     fun `basic properties work on default directions`() {
         Assertions.assertThat(Vector.NORTH.isVertical).isTrue()

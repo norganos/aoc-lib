@@ -1,4 +1,4 @@
-package de.linkel.aoc.utils
+package de.linkel.aoc.utils.math
 
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
