@@ -165,6 +165,12 @@ class PolygonTests {
     }
 
     @Test
+    fun `name can be set`() {
+        val polygon = Polygon(listOf(Point(1,1), Point(4,1), Point(1,5)), "my-name")
+        Assertions.assertThat(polygon.named("foo").name).isEqualTo("foo")
+    }
+
+    @Test
     fun `test Polygon isWellFormed`() {
         val polygon1 = Polygon(listOf(Point(1,1), Point(4,1), Point(1,5)))
         val polygon2 = Polygon(listOf(Point(1,1), Point(4,1), Point(4,4), Point(1,4)))

@@ -14,9 +14,11 @@ class DimensionTests {
     }
 
     @Test
-    fun `negative dimension do not work`() {
+    fun `negative or zero dimension do not work`() {
         Assertions.assertThatThrownBy { Dimension(-1, 1) }.isInstanceOf(IllegalArgumentException::class.java)
         Assertions.assertThatThrownBy { Dimension(1, -1) }.isInstanceOf(IllegalArgumentException::class.java)
+        Assertions.assertThatThrownBy { Dimension(0, 1) }.isInstanceOf(IllegalArgumentException::class.java)
+        Assertions.assertThatThrownBy { Dimension(1, 0) }.isInstanceOf(IllegalArgumentException::class.java)
     }
 
     @Test

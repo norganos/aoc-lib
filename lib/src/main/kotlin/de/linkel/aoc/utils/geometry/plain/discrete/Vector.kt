@@ -3,7 +3,7 @@ package de.linkel.aoc.utils.geometry.plain.discrete
 import de.linkel.aoc.utils.geometry.plain.continuous.VectorD
 import kotlin.math.*
 
-data class Vector(
+class Vector(
     val deltaX: Int,
     val deltaY: Int
 ) {
@@ -20,7 +20,7 @@ data class Vector(
     }
 
     val manhattanDistance = abs(deltaX) + abs(deltaY)
-    val distance = sqrt(deltaX.toDouble().pow(2) + deltaY.toDouble().pow(2))
+    val length = sqrt(deltaX.toDouble().pow(2) + deltaY.toDouble().pow(2))
     val maximumAxisDistance get(): Int = max(abs(deltaX), abs(deltaY))
     val isVertical get(): Boolean = deltaX == 0
     val isHorizontal get(): Boolean = deltaY == 0
@@ -76,4 +76,22 @@ data class Vector(
     }
 
     fun toContinuous() = VectorD(deltaX.toDouble(), deltaY.toDouble())
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Vector
+
+        if (deltaX != other.deltaX) return false
+        if (deltaY != other.deltaY) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = deltaX.hashCode()
+        result = 31 * result + deltaY.hashCode()
+        return result
+    }
 }

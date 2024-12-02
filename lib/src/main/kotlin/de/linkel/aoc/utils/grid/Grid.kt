@@ -1,5 +1,10 @@
 package de.linkel.aoc.utils.grid
 
+import de.linkel.aoc.utils.geometry.plain.discrete.Dimension
+import de.linkel.aoc.utils.geometry.plain.discrete.Point
+import de.linkel.aoc.utils.geometry.plain.discrete.Rectangle
+import de.linkel.aoc.utils.geometry.plain.discrete.Vector
+
 class Grid<T: Any>(
     origin: Point = Point(0,0),
     dimension: Dimension = Dimension(1,1)
@@ -115,6 +120,7 @@ class Grid<T: Any>(
             .toList()
     }
 
+    @Suppress("unused")
     fun getBeams(pos: Point): List<List<DataPoint<T>>> {
         val row = getRowData(pos.y)
         val col = getColData(pos.x)
@@ -147,6 +153,7 @@ class Grid<T: Any>(
             }
     }
 
+    @Suppress("unused")
     fun <R: Any> transformComplete(lambda: (points: Map<Point, T>) -> Map<Point, R>): Grid<R> {
         return Grid<R>(boundingBox.origin, boundingBox.dimension)
             .let { other ->
@@ -166,6 +173,7 @@ class Grid<T: Any>(
             }
     }
 
+    @Suppress("unused")
     fun filterData(lambda: (pos: Point, data: T) -> Boolean): List<DataPoint<T>> {
         return store.entries
             .filter { lambda(it.key, it.value) }
@@ -185,22 +193,23 @@ class Grid<T: Any>(
     }
 
     private val directions4 = listOf(
-        Vector(1, 0),
-        Vector(0, 1),
-        Vector(-1, 0),
-        Vector(0, -1)
+        Vector.NORTH,
+        Vector.EAST,
+        Vector.SOUTH,
+        Vector.WEST
     )
     private val directions8 = listOf(
-        Vector(1, 0),
-        Vector(1, 1),
-        Vector(0, 1),
-        Vector(-1, 1),
-        Vector(-1, 0),
-        Vector(-1, -1),
-        Vector(0, -1),
-        Vector(1, -1)
+        Vector.NORTH,
+        Vector.NORTH_EAST,
+        Vector.EAST,
+        Vector.SOUTH_EAST,
+        Vector.SOUTH,
+        Vector.SOUTH_WEST,
+        Vector.WEST,
+        Vector.NORTH_WEST
     )
 
+    @Suppress("unused")
     fun getNeighbours(point: Point, diagonal: Boolean = false): List<DataPoint<T>> {
         return (if (diagonal) directions8 else directions4)
             .map { point + it }
@@ -208,6 +217,7 @@ class Grid<T: Any>(
             .map { DataPoint(it, store[it]!!)}
     }
 
+    @Suppress("unused")
     fun dijkstra(start: Point, isDest: (point: DataPoint<T>) -> Boolean, getNeighbours: (from: DataPoint<T>) -> Collection<Point>): List<DataPoint<T>>? {
         val max = this.area + 1
         val weightMap = transform { p, d -> DijkstraNode(d, if (p == start) 0 else max, null) }
@@ -250,7 +260,7 @@ class Grid<T: Any>(
     )
 }
 
-
+@Suppress("unused")
 infix fun <T : Any> Point.inside(grid: Grid<T>): Boolean {
     return this in grid.boundingBox
 }

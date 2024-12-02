@@ -5,6 +5,7 @@ interface Shape<T: Shape<T>> {
     val segments: List<Segment>
     val corners: List<Point>
     val area: Int
+    val name: String
 
     operator fun plus(vector: Vector): T
     operator fun minus(vector: Vector): T
@@ -12,6 +13,9 @@ interface Shape<T: Shape<T>> {
 
     operator fun contains(point: Point): Boolean
 
-    fun intersects(segment: Segment): Boolean
     fun intersects(shape: Shape<*>): Boolean
+
+    fun toAnonymous(): T
+    fun named(name: String): T
+    //TODO: toContinuous hier deklarieren?
 }

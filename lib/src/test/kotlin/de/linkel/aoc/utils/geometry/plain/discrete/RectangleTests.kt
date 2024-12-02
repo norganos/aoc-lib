@@ -204,10 +204,16 @@ class RectangleTests {
         val poly = rect.toPolygon()
         Assertions.assertThat(poly.name).isEqualTo("my-name")
     }
-    
+
     @Test
     fun `name can be removed`() {
         val rect = Rectangle(1, 1, 3, 2, "my-name")
         Assertions.assertThat(rect.toAnonymous().name).isEqualTo("")
+    }
+
+    @Test
+    fun `name can be set`() {
+        val rect = Rectangle(1, 1, 3, 2, "my-name")
+        Assertions.assertThat(rect.named("foo").name).isEqualTo("foo")
     }
 }

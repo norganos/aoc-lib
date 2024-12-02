@@ -9,7 +9,7 @@ import kotlin.math.sign
 
 class Polygon(
     corners: List<Point>,
-    val name: String = "",
+    override val name: String = "",
 ): Shape<Polygon> {
     override val corners: List<Point>
     override val boundingBox: Rectangle
@@ -126,29 +126,31 @@ class Polygon(
         TODO("Not yet implemented")
     }
 
-    override fun intersects(segment: Segment): Boolean {
-        return segment.start in this || segment.end in this || segments.any { polygonSegment -> polygonSegment.intersects(segment) }
-    }
-
     override fun intersects(shape: Shape<*>): Boolean {
-        return boundingBox.intersects(shape.boundingBox) && shape.segments.any { this.intersects(it) }
+        return when (shape) {
+            is Point -> contains(shape)
+            is Segment -> contains(shape.start) || contains(shape.end) || segments.any { polygonSegment ->
+                polygonSegment.intersects(
+                    shape
+                )
+            }
+
+            else -> boundingBox.intersects(shape.boundingBox) && shape.segments.any { this.intersects(it) }
+        }
     }
 
     private fun Int.isOdd() = this % 2 != 0
 
     fun toContinuous() = PolygonD(corners.map { it.toContinuous() })
 
-    fun toAnonymous() = Polygon(corners)
+    override fun toAnonymous() = Polygon(corners)
+    override fun named(name: String) = Polygon(corners, name)
 
     override fun toString(): String {
         return "$name ${corners.take(corners.size-1).joinToString("->")}".trim()
     }
 
     fun isConcave(): Boolean {
-//        TODO("Not yet implemented")
-        // kann ich hier einfach die winkel zwicshen den segmenten betrachten?
-        // dass quasi alle winkel in dieselbe richtung (rechts/links) zeigen muessen,
-        // dann isses konkav?
         return (segments.plusElement(segments.first()))
             .zipWithNext { a, b -> a.vector.determinant(b.vector) }
             .filter { it != 0 }

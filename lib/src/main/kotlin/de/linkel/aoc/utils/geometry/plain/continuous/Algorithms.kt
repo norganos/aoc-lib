@@ -1,53 +1,84 @@
 package de.linkel.aoc.utils.geometry.plain.continuous
 
-import kotlin.math.max
-import kotlin.math.min
+import java.util.*
 
 class Algorithms {
     companion object {
-        fun anySegmentsIntersect(segments: Iterable<Pair<PointD,PointD>>): Boolean {
+        private fun sweepLine(segments: Iterable<SegmentD>, all: Boolean): Set<Set<SegmentD>> {
+            data class OpenSegment(
+                val segment: SegmentD,
+                val idx: Int,
+                val y: Double = segment.start.y
+            )
+            val comparator = compareBy(
+                { openSegment: OpenSegment -> openSegment.y },
+                { openSegment: OpenSegment -> openSegment.idx },
+            )
+            data class Event(
+                val eventPoint: PointD,
+                val isStart: Boolean,
+                val segment: SegmentD,
+                val originalSegment: SegmentD,
+                val idx: Int
+            )
+            // sweep line algorithm
             val events = segments
-                .map { (a, b) ->
-                    if (a.x < b.x) a to b
-                    else if (b.x < a.x) b to a
-                    else if (a.y < b.y) a to b
-                    else if (b.y < a.y) b to a
-                    else a to b
+                // transform our segments into point pairs where the first point is left of the other one
+                .map { seg ->
+                    seg to if (seg.start.x < seg.end.x) seg
+                    else if (seg.end.x < seg.start.x) seg.turnAround()
+                    else if (seg.start.y < seg.end.y) seg
+                    else if (seg.end.y < seg.start.y) seg.turnAround()
+                    else seg
                 }
-                .flatMapIndexed { idx, (a, b) -> listOf(a to (idx to 0), b to (idx to 1)) }
-                .sortedWith(compareBy({ it.first.x }, { it.first.y }))
+                .toSet()
+                //.flatMapIndexed { idx, (a, b) -> listOf(Event(a to (idx to 0), b to (idx to 1)) }
+                .flatMapIndexed { idx, (origSeg, normalSeg) ->
+                    listOf(
+                        Event(eventPoint = normalSeg.start, isStart = true, segment = normalSeg, originalSegment = origSeg, idx = idx),
+                        Event(eventPoint = normalSeg.end, isStart = false, segment = normalSeg, originalSegment = origSeg, idx = idx)
+                    )
+                }
+                .sortedWith(compareBy({ it.eventPoint.x }, { it.eventPoint.y }))
 
-
+            val openSegments = TreeMap<OpenSegment, SegmentD>(comparator)
+            val result = mutableSetOf<Set<SegmentD>>()
             for (event in events) {
-
+                val checkSegment = if (event.isStart) {
+                    OpenSegment(event.segment, idx = event.idx)
+                        .also {
+                            openSegments[it] = event.originalSegment
+                        }
+                } else {
+                    OpenSegment(event.segment, idx = event.idx)
+                        .also {
+                            openSegments.remove(it)
+                        }
+                        .copy(y = event.segment.end.y)
+                }
+                val intersections = if (checkSegment.segment.isVertical)
+                        openSegments.entries
+                            .toList()
+                            .filter { it.key.segment != event.segment}
+                    else
+                        listOfNotNull(openSegments.higherEntry(checkSegment), openSegments.lowerEntry(checkSegment))
+                            .filter {
+                                it.key.segment.intersects(event.segment)
+                            }
+                for (intersection in intersections) {
+                    result.add(setOf(event.originalSegment, intersection.value))
+                    if (!all) {
+                        break
+                    }
+                }
             }
-            return false
-            //TODO: vertical segments
-
+            return result
         }
-        private fun angleDirection(p: PointD, q: PointD, r: PointD) = (q - p).determinant(r - q)
-        private fun onSegment(p: PointD, q: PointD, x: PointD): Boolean {
-            val topright = max(p.x, q.x) to min(p.y, q.y)
-            val botleft = min(p.x, q.x) to max(p.y, q.y)
-            return x.x <= topright.first && x.y <= topright.second && botleft.first <= x.x && botleft.second <= x.y
+        fun segmentIntersections(segments: Iterable<SegmentD>): Set<Set<SegmentD>> {
+            return sweepLine(segments, true)
         }
-
-        fun segmentsIntersect(a: SegmentD, b: SegmentD): Boolean {
-            val d1 = angleDirection(a.start, a.end, b.start)
-            val d2 = angleDirection(a.start, a.end, b.end)
-            if ((d1 == 0.0 && onSegment(a.start, a.end, b.start)) || (d2 == 0.0 && onSegment(a.start, a.end, b.end)))
-                return true
-            if ((d1 > 0.0 && d2 > 0.0) || (d1 < 0.0 && d2 < 0.0))
-                return false
-            val d3 = angleDirection(b.start, b.end, a.start)
-            val d4 = angleDirection(b.start, b.end, a.end)
-            if ((d3 == 0.0 && onSegment(b.start, b.end, a.start)) || (d4 == 0.0 && onSegment(b.start, b.end, a.end)))
-                return true
-            if ((d3 > 0.0 && d4 > 0.0) || (d3 < 0.0 && d4 < 0.0))
-                return false
-            if (d1 == 0.0 && d2 == 0.0 && d3 == 0.0 && d4 == 0.0)
-                return false
-            return true
+        fun anySegmentsIntersect(segments: Iterable<SegmentD>): Boolean {
+            return sweepLine(segments, false).isNotEmpty()
         }
     }
 }

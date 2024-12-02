@@ -3,33 +3,45 @@ package de.linkel.aoc.utils.geometry.plain.continuous
 import kotlin.math.max
 import kotlin.math.min
 
-data class RectangleD(
+class RectangleD(
     val x: Double,
     val y: Double,
     val width: Double,
-    val height: Double
-) {
+    val height: Double,
+    override val name: String = "",
+): ShapeD<RectangleD> {
     init {
         if (width <= 0) throw IllegalArgumentException("width must be greater than 0")
         if (height <= 0) throw IllegalArgumentException("width must be greater than 0")
     }
 
-    var id = ""
     val origin = PointD(x, y)
     val northWest get(): PointD = PointD(x, y)
-    @Suppress("unused")
     val northEast get(): PointD = PointD(x + width - 1, y)
     val southEast get(): PointD = PointD(x + width - 1, y + height - 1)
-    @Suppress("unused")
     val southWest get(): PointD = PointD(x, y + height - 1)
     val dimension = DimensionD(width, height)
 
-    val corners get(): List<PointD> = listOf(northWest, northEast, southEast, southWest)
+    override val boundingBox get(): RectangleD = this
+    override val segments get(): List<SegmentD> = listOf(
+        SegmentD(northWest, VectorD(width, 0.0)),
+        SegmentD(northEast, VectorD(0.0, height)),
+        SegmentD(southEast, VectorD(-width, 0.0)),
+        SegmentD(southWest, VectorD(0.0, -height))
+    )
 
-    val area get(): Double = width * height
+    override val corners get(): List<PointD> = listOf(northWest, northEast, southEast, southWest)
 
-    operator fun contains(point: PointD): Boolean {
+    override val area get(): Double = width * height
+
+    override operator fun contains(point: PointD): Boolean {
         return point.x >= x && point.y >= y && point.x < x + width && point.y < y + height
+    }
+    operator fun contains(shape: ShapeD<*>): Boolean {
+        return if (shape is RectangleD)
+            x <= shape.x && y <= shape.y && x + width >= shape.x + shape.width && y + height >= shape.y + shape.height
+        else
+            contains(shape.boundingBox)
     }
 
     fun extendTo(point: PointD): RectangleD {
@@ -37,54 +49,95 @@ data class RectangleD(
         val y = min(this.y, point.y)
         val w = max(this.x + width, point.x + 1) - x
         val h = max(this.y + height, point.y + 1) - y
-        return copy(
+        return RectangleD(
             x = x,
             y = y,
             width = w,
-            height = h
+            height = h,
+            name = name
         )
     }
 
     override fun toString(): String {
-        return "$id ${width}x${height}@${x}/${y}".trim()
+        return "$name ${width}x${height}@${x}/${y}".trim()
     }
 
-    operator fun plus(vector: VectorD): RectangleD {
-        return copy(
+    override operator fun plus(vector: VectorD): RectangleD {
+        return RectangleD(
             x = x + vector.deltaX,
-            y = y + vector.deltaY
+            y = y + vector.deltaY,
+            width = width,
+            height = height,
+            name = name
         )
     }
-    operator fun minus(vector: VectorD): RectangleD {
-        return copy(
+    override operator fun minus(vector: VectorD): RectangleD {
+        return RectangleD(
             x = x - vector.deltaX,
-            y = y - vector.deltaY
+            y = y - vector.deltaY,
+            width = width,
+            height = height,
+            name = name
         )
     }
-    operator fun times(factor: Double): RectangleD {
-        return copy(
+    override operator fun times(factor: Double): RectangleD {
+        return RectangleD(
+            x = x,
+            y = y,
             width = width * factor,
-            height = height * factor
+            height = height * factor,
+            name = name
         )
     }
 
-    fun intersects(other: RectangleD): Boolean {
-        return ((this.x <= other.x && (x + width) >= other.x) || (other.x <= this.x && (other.x + other.width) >= this.x))
-            && ((this.y <= other.y && (y + height) >= other.y) || (other.y <= this.y && (other.y + other.height) >= this.y))
+    override fun intersects(shape: ShapeD<*>): Boolean {
+        return when (shape) {
+            is PointD -> contains(shape)
+            is SegmentD -> x < max(shape.start.x, shape.end.x) && x + width > min(shape.start.x, shape.end.x)
+                    && y < max(shape.start.y, shape.end.y) && y + height > min(shape.start.y, shape.end.y)
+            is RectangleD -> x < shape.x + shape.width && x + width > shape.x
+                    && y < shape.y + shape.height && y + height > shape.y
+            else -> shape.segments.any { intersects(it) } || shape.contains(origin)
+        }
     }
 
     fun intersect(other: RectangleD): RectangleD? {
-        val minX = max(x, other.x)
-        val minY = max(y, other.y)
-        val maxX = min(x + width, other.x + other.width)
-        val maxY = min(y + height, other.y + other.height)
-        return if (minX <= maxX && minY <= maxY) {
-            RectangleD(minX, minY, maxY - minX, maxY - minY)
+        val left = max(x, other.x)
+        val top = max(y, other.y)
+        val right = min(x + width, other.x + other.width)
+        val bottom = min(y + height, other.y + other.height)
+        return if (left < right && top < bottom) {
+            RectangleD(left, top, right - left, bottom - top)
         } else null
     }
 
-    fun toPolygon(): PolygonD = PolygonD(corners)
+    fun toPolygon(): PolygonD = PolygonD(corners, name)
+
+    override fun toAnonymous() = RectangleD(x, y, width, height)
+    override fun named(name: String) = RectangleD(x, y, width, height, name)
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as RectangleD
+
+        if (x != other.x) return false
+        if (y != other.y) return false
+        if (width != other.width) return false
+        if (height != other.height) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = x.hashCode()
+        result = 31 * result + y.hashCode()
+        result = 31 * result + width.hashCode()
+        result = 31 * result + height.hashCode()
+        return result
+    }
 }
 
-fun RectangleD(a: PointD, b: PointD) = RectangleD(x = min(a.x, b.x), y = min(a.y, b.y), width = max(a.x, b.x) - min(a.x, b.x) + 1, height = max(a.y, b.y) - min(a.y, b.y) + 1)
-fun RectangleD(p: PointD, d: DimensionD) = RectangleD(x = p.x, y = p.y, width = d.width, height = d.height)
+fun RectangleD(a: PointD, b: PointD, name: String = "") = RectangleD(x = min(a.x, b.x), y = min(a.y, b.y), width = max(a.x, b.x) - min(a.x, b.x) + 1, height = max(a.y, b.y) - min(a.y, b.y) + 1, name = name)
+fun RectangleD(origin: PointD, dimension: DimensionD, name: String = "") = RectangleD(x = origin.x, y = origin.y, width = dimension.width, height = dimension.height, name = name)

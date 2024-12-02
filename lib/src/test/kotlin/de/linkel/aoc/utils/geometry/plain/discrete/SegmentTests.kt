@@ -44,13 +44,21 @@ class SegmentTests {
     @Test
     fun `test Segment distance calculation`() {
         val segment = Segment(Point(0, 0), Point(3, 4))
-        Assertions.assertThat(segment.distance).isEqualTo(5.0)
+        Assertions.assertThat(segment.length).isEqualTo(5.0)
     }
 
     @Test
     fun `test Segment manhattanDistance calculation`() {
         val segment = Segment(Point(0, 0), Point(3, 4))
         Assertions.assertThat(segment.manhattanDistance).isEqualTo(7)
+    }
+
+    @Test
+    fun `test SegmentD isVertical and isHorizontal calculation`() {
+        Assertions.assertThat(Segment(Point(1,1), Vector(3,4)).isVertical).isFalse()
+        Assertions.assertThat(Segment(Point(1,1), Vector(0,4)).isVertical).isTrue()
+        Assertions.assertThat(Segment(Point(1,1), Vector(3,4)).isHorizontal).isFalse()
+        Assertions.assertThat(Segment(Point(1,1), Vector(3,0)).isHorizontal).isTrue()
     }
 
     @Test
@@ -152,5 +160,11 @@ class SegmentTests {
     fun `name can be removed`() {
         val seg = Segment(Point(0, 0), Point(2, 2), "my-name")
         Assertions.assertThat(seg.toAnonymous().name).isEqualTo("")
+    }
+
+    @Test
+    fun `name can be set`() {
+        val seg = Segment(Point(0, 0), Point(2, 2), "my-name")
+        Assertions.assertThat(seg.named("foo").name).isEqualTo("foo")
     }
 }

@@ -24,7 +24,7 @@ class VectorTests {
     
     @Test
     fun `test Vector distance calculation`() {
-        Assertions.assertThat(Vector(3, 4).distance).isEqualTo(5.0)
+        Assertions.assertThat(Vector(3, 4).length).isEqualTo(5.0)
     }
 
     @Test

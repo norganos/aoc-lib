@@ -26,7 +26,7 @@ class PointTests {
     fun `test Point distance calculation`() {
         val point1 = Point(0, 0)
         val point2 = Point(3, 4)
-        Assertions.assertThat(point1.rangeTo(point2).distance).isEqualTo(5.0)
+        Assertions.assertThat(point1.rangeTo(point2).length).isEqualTo(5.0)
     }
 
     @Test
@@ -82,4 +82,22 @@ class PointTests {
         Assertions.assertThat(Point(3,2).toContinuous()).isEqualTo(PointD(3.0, 2.0))
     }
 
+    @Test
+    fun `moving and scaling preserves name`() {
+        val point = Point(3, 3, "my-name")
+        val moved = point.plus(Vector.NORTH).minus(Vector.EAST).times(2)
+        Assertions.assertThat(moved.name).isEqualTo("my-name")
+    }
+
+    @Test
+    fun `name can be removed`() {
+        val point = Point(3, 3, "my-name")
+        Assertions.assertThat(point.toAnonymous().name).isEqualTo("")
+    }
+
+    @Test
+    fun `name can be set`() {
+        val point = Point(3, 3, "my-name")
+        Assertions.assertThat(point.named("foo").name).isEqualTo("foo")
+    }
 }
