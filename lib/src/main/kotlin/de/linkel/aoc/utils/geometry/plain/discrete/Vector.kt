@@ -1,6 +1,7 @@
 package de.linkel.aoc.utils.geometry.plain.discrete
 
 import de.linkel.aoc.utils.geometry.plain.continuous.VectorD
+import de.linkel.aoc.utils.math.CommonMath
 import kotlin.math.*
 
 class Vector(
@@ -49,6 +50,15 @@ class Vector(
                 && this.deltaY.sign == other.deltaY.sign
                 && abs(this.deltaX) >= abs(other.deltaX)
                 && abs(this.deltaY) >= abs(other.deltaY)
+    }
+
+    fun min(): Vector {
+        return if (deltaX == 0) Vector(deltaX = 0, deltaY = deltaY.sign)
+        else if (deltaY == 0) Vector(deltaX = deltaX.sign, deltaY = 0)
+        else {
+            val gcd = CommonMath.gcd(deltaX, deltaY)
+            Vector(deltaX / gcd, deltaY / gcd)
+        }
     }
 
     fun turnClockwise(): Vector = Vector(-deltaY, deltaX)

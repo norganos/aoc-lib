@@ -10,7 +10,7 @@ class Grid<T: Any>(
     dimension: Dimension = Dimension(1,1)
 ) {
     companion object {
-        fun <T: Any> parse(lines: Sequence<String>, lambda: (pos: Point, c: Char) -> T?): Grid<T> {
+        fun <T: Any> parse(lines: Sequence<String>, crop: Boolean = true, lambda: (pos: Point, c: Char) -> T?): Grid<T> {
             val grid = Grid<T>()
             lines
                 .filter { it.isNotEmpty() }
@@ -27,7 +27,8 @@ class Grid<T: Any>(
                             }
                         }
                 }
-            grid.crop()
+            if (crop)
+                grid.crop()
             return grid
         }
     }
@@ -38,6 +39,24 @@ class Grid<T: Any>(
         width = dimension.width,
         height = dimension.height
     )
+
+    fun straightLine(start: Point, direction: Vector): List<Point> {
+        val result = mutableListOf<Point>()
+        var pos = start
+        while (pos in boundingBox) {
+            result.add(pos)
+            pos += direction
+        }
+        return result
+    }
+
+    fun walkUntil(start: Point, vector: Vector, stop: (point: Point) -> Boolean): Point {
+        var pos = start
+        while (true) {
+            pos += vector
+            if (stop(pos)) return pos
+        }
+    }
 
     // evtl nen performance-optimierteren zugriff? / ne liste aller belegten punkte pro row/col?
     private val store = mutableMapOf<Point, T>()

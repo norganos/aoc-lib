@@ -21,6 +21,20 @@ class VectorTests {
         Assertions.assertThat(vector1).isEqualTo(vector2)
         Assertions.assertThat(vector1).isNotEqualTo(vector3)
     }
+
+    @Test
+    fun `test Vector min method`() {
+        val vector1 = Vector(2, 3)
+        val vector2 = Vector(18, 6)
+        val vector3 = Vector(5, 0)
+        val vector4 = Vector(0, 2)
+        val vector5 = Vector(0, 0)
+        Assertions.assertThat(vector1.min()).isEqualTo(vector1)
+        Assertions.assertThat(vector2.min()).isEqualTo(Vector(3, 1))
+        Assertions.assertThat(vector3.min()).isEqualTo(Vector(1, 0))
+        Assertions.assertThat(vector4.min()).isEqualTo(Vector(0, 1))
+        Assertions.assertThat(vector5.min()).isEqualTo(Vector(0, 0))
+    }
     
     @Test
     fun `test Vector distance calculation`() {
