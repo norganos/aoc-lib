@@ -10,6 +10,7 @@ class Graph<K>(
 ) {
     private val network = nodes.associateBy { it.id }
 
+    //TODO: add a lambda that gives cost from one K to another
     fun dijkstra(start: K, isDest: (id: K) -> Boolean): List<K>? {
         val max = this.network.size + 1
         val weightMap = network.mapValues { e -> DijkstraNode(e.key, if (e.key == start) 0 else max, null) }.toMutableMap()

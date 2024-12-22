@@ -23,4 +23,14 @@ class EquationTests {
             )
         ).isNull()
     }
+
+    @Test
+    fun `simple 3x3 cramer`() {
+        Assertions.assertThat(
+            Equations.cramer(
+                Matrix(3, 3, bd(2, 3, -1, 1, 1, 1, -3, -4, 3)),
+                bd(5, 6, -5)
+            )
+        ).isEqualTo(bd(5, -1, 2))
+    }
 }
